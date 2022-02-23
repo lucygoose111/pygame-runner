@@ -1,6 +1,8 @@
+from pickle import TRUE
 import pygame
 
 pygame.init()
+game_active = True
 screen = pygame.display.set_mode((800,400))
 pygame.display.set_caption('Runner')
 clock = pygame.time.Clock()
@@ -18,35 +20,42 @@ snail_rect = snail_surface.get_rect(bottomright=(600,300))
 
 player_surface = pygame.image.load('graphics/player/player_walk_1.png').convert_alpha()
 player_rect = player_surface.get_rect(midbottom=(80,300))
+player_gravity = 0
 
 while True:
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             pygame.quit()
             exit()
-        if event.type == pygame.MOUSEMOTION:
-            if player_rect.collidepoint(event.pos):
-                exit()
-            
-    screen.blit(sky_surface, (0,0))
-    screen.blit(ground_surface, (0,300))
-    pygame.draw.rect(screen, (192,232,236), score_rect)
-    pygame.draw.rect(screen, (192,232,236), score_rect, 10)
- 
-    screen.blit(score_surface, score_rect)
-    screen.blit(snail_surface,snail_rect)
-    snail_rect.x -= 4
-    if snail_rect.right <= 0: snail_rect.left = 800
-    screen.blit(player_surface,player_rect)
+      
+    if game_active:
+        screen.blit(sky_surface, (0,0))
+        screen.blit(ground_surface, (0,300))
+        pygame.draw.rect(screen, (192,232,236), score_rect)
+        pygame.draw.rect(screen, (192,232,236), score_rect, 10)
+    
+        screen.blit(score_surface, score_rect)
+        screen.blit(snail_surface,snail_rect)
+        snail_rect.x -= 4
+        if snail_rect.right <= 0: snail_rect.left = 800
 
-    keys = pygame.key.get_pressed
-    keys[pygame.K_SPACE]
-    # if player_rect.colliderect(snail_rect):
-    #     exit()
+        # Player
+        player_gravity += 1
+        player_rect.y += player_gravity
+        if player_rect.bottom >= 300: 
+            player_rect.bottom = 300
+        screen.blit(player_surface,player_rect)
 
-    # mouse_pos = pygame.mouse.get_pos()
-    # if player_rect.collidepoint(mouse_pos):
-    #     print(pygame.mouse.get_pressed())
+        # collision
+        if player_rect.colliderect(snail_rect):
+            game_active = False
+
+        keys = pygame.key.get_pressed()
+        if keys[pygame.K_SPACE]:
+            if player_rect.bottom == 300:
+                player_gravity = -20
+    else:
+        screen.fill('Blue')
 
     pygame.display.update()
     clock.tick(60)
