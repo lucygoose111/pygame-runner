@@ -1,1 +1,3 @@
 # Pygame Runner
+
+In this tutorial you will learn to create a runner game in Python with Pygame. The game itself isn't the goal of the video. Instead, I will use the game to go through every crucial aspect of Pygame that you need to know to get started. By the end of the video, you should know all the basics to start basically any 2D game, starting from Pong and ending with the first generation of Doom and Wolfenstein. Here's the link to the video: https://www.youtube.com/watch?v=AY9MnQ4x3zk&t=6912s&ab_channel=ClearCode
