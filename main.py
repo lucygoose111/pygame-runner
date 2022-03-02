@@ -30,6 +30,15 @@ def collide(player,obstacles):
     
     return True
 
+def player_anim():
+    global player_surf, player_index
+    if player_rect.bottom < 300:
+        player_surf = player_jump
+    else:
+        player_index += 0.1
+        if player_index >= len(player_walk): player_index = 0
+        player_surf = player_walk[int(player_index)]
+
 pygame.init()
 game_active = False
 start_time = 0
@@ -44,12 +53,26 @@ sky_surf = pygame.image.load('graphics/Sky.png').convert()
 ground_surf = pygame.image.load('graphics/ground.png').convert()
 
 # Obstacles
-snail_surf = pygame.image.load('graphics/snail/snail1.png').convert_alpha()
-fly_surf = pygame.image.load('graphics/fly/fly1.png').convert_alpha()
+snail_move_1 = pygame.image.load('graphics/snail/snail1.png').convert_alpha()
+snail_move_2 = pygame.image.load('graphics/snail/snail2.png').convert_alpha()
+snail_frames = [snail_move_1,snail_move_2]
+snail_index = 0
+snail_surf = snail_frames[snail_index]
+
+fly_move_1 = pygame.image.load('graphics/fly/fly1.png').convert_alpha()
+fly_move_2 = pygame.image.load('graphics/fly/fly2.png').convert_alpha()
+fly_frames = [fly_move_1,fly_move_2]
+fly_index = 0
+fly_surf = fly_frames[fly_index]
 
 obstacle_rect_list = []
 
-player_surf = pygame.image.load('graphics/player/player_walk_1.png').convert_alpha()
+player_walk_1 = pygame.image.load('graphics/player/player_walk_1.png').convert_alpha()
+player_walk_2 = pygame.image.load('graphics/player/player_walk_2.png').convert_alpha()
+player_walk = [player_walk_1,player_walk_2]
+player_index = 0
+player_jump = pygame.image.load('graphics/player/jump.png').convert_alpha()
+player_surf = player_walk[player_index]
 player_rect = player_surf.get_rect(midbottom=(80,300))
 player_gravity = 0
 player_stand = pygame.image.load('graphics/player/player_stand.png').convert_alpha()
@@ -60,8 +83,15 @@ game_name_rect = game_name.get_rect(center = (400,80))
 game_ins = font_pixeltype.render('Press enter to start', False, (111,196,169))
 game_ins_rect = game_ins.get_rect(center=(400,320))
 
+# Timers
 obstacle_timer = pygame.USEREVENT + 1
 pygame.time.set_timer(obstacle_timer, 900)
+
+snail_anim_timer = pygame.USEREVENT + 2
+pygame.time.set_timer(snail_anim_timer, 500)
+
+fly_anim_timer = pygame.USEREVENT + 3
+pygame.time.set_timer(fly_anim_timer, 200)
 
 while True:
     for event in pygame.event.get():
@@ -74,11 +104,20 @@ while True:
                 game_active = True
                 start_time = int(pygame.time.get_ticks() / 1000)
 
-        if event.type == obstacle_timer and game_active:
-            if randint(0,1):
-                obstacle_rect_list.append(snail_surf.get_rect(bottomright = (randint(900, 1100), 300)))
-            else:
-                obstacle_rect_list.append(fly_surf.get_rect(bottomright = (randint(900, 1100), 210)))
+        if game_active:
+            if event.type == obstacle_timer:
+                if randint(0,1):
+                    obstacle_rect_list.append(snail_surf.get_rect(bottomright = (randint(900, 1100), 300)))
+                else:
+                    obstacle_rect_list.append(fly_surf.get_rect(bottomright = (randint(900, 1100), 210)))
+            if event.type == snail_anim_timer:
+                if snail_index == 0: snail_index = 1
+                else: snail_index = 0
+                snail_surf = snail_frames[snail_index]
+            if event.type == fly_anim_timer:
+                if fly_index == 0: fly_index = 1
+                else: fly_index = 0
+                fly_surf = fly_frames[fly_index]
 
       
     if game_active:
@@ -91,6 +130,7 @@ while True:
         player_rect.y += player_gravity
         if player_rect.bottom >= 300: 
             player_rect.bottom = 300
+        player_anim()
         screen.blit(player_surf,player_rect)
 
         # obstacle movement
@@ -112,6 +152,8 @@ while True:
         screen.blit(game_ins,game_ins_rect)
         if score > 0: screen.blit(score_message,score_message_rect)
         obstacle_rect_list = []
+        player_rect.midbottom = (80,300)
+        player_gravity = 0
 
     pygame.display.update()
     clock.tick(60)
