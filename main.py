@@ -18,11 +18,14 @@ class Player(pygame.sprite.Sprite):
         self.image = self.player_walk[self.player_index]
         self.rect = self.image.get_rect(midbottom=(80,300))
         self.gravity = 0
+        self.jump_sound = pygame.mixer.Sound('C:/Dev/pygame/audio/jump.wav')
+        self.jump_sound.set_volume(.3)
 
     def player_input(self):
         keys = pygame.key.get_pressed()
         if keys[pygame.K_SPACE] and self.rect.bottom >= 300:
             self.gravity = -20
+            self.jump_sound.play()
     
     def apply_gravity(self):
         self.gravity += 1
@@ -34,7 +37,7 @@ class Player(pygame.sprite.Sprite):
         self.rect.bottom = 300
     
     def animation_state(self):
-        if self.rect.bottom > 300:
+        if self.rect.bottom < 300:
             self.image = self.player_jump
         else:
             self.player_index += 0.1
@@ -91,6 +94,7 @@ def collision_sprite():
     if pygame.sprite.spritecollide(player.sprite, obstacle, False):
         obstacle.empty()
         player.sprite.reset()
+        bg_music.fadeout(1000)
         return False
     else:
         return True
@@ -99,6 +103,10 @@ player = pygame.sprite.GroupSingle()
 player.add(Player())
 
 obstacle = pygame.sprite.Group()
+
+# Music
+bg_music = pygame.mixer.Sound('audio/music.wav')
+bg_music.set_volume(0.7)
 
 score = 0
 pygame.display.set_caption('Runner')
@@ -127,6 +135,8 @@ pygame.time.set_timer(snail_anim_timer, 500)
 fly_anim_timer = pygame.USEREVENT + 3
 pygame.time.set_timer(fly_anim_timer, 200)
 
+if game_active: bg_music.play
+
 while True:
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
@@ -137,6 +147,7 @@ while True:
             if event.type == pygame.KEYDOWN and event.key == pygame.K_RETURN:
                 game_active = True
                 start_time = int(pygame.time.get_ticks() / 1000)
+                bg_music.play(loops=-1)
 
         if game_active:
             if event.type == obstacle_timer:
