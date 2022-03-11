@@ -18,7 +18,7 @@ class Player(pygame.sprite.Sprite):
         self.image = self.player_walk[self.player_index]
         self.rect = self.image.get_rect(midbottom=(80,300))
         self.gravity = 0
-        self.jump_sound = pygame.mixer.Sound('C:/Dev/pygame/audio/jump.wav')
+        self.jump_sound = pygame.mixer.Sound('audio/jump.wav')
         self.jump_sound.set_volume(.3)
 
     def player_input(self):
@@ -35,6 +35,7 @@ class Player(pygame.sprite.Sprite):
     
     def reset(self):
         self.rect.bottom = 300
+        self.gravity = 0 
     
     def animation_state(self):
         if self.rect.bottom < 300:
@@ -67,7 +68,7 @@ class Obstacle(pygame.sprite.Sprite):
         self.index = 0
 
         self.image = self.frames[self.index]
-        self.rect = self.image.get_rect(midbottom = (randint(900, 1000), y_pos))
+        self.rect = self.image.get_rect(midbottom = (randint(900, 1080), y_pos))
     
     def animation_state(self):
         self.index += 0.1
@@ -151,7 +152,7 @@ while True:
 
         if game_active:
             if event.type == obstacle_timer:
-                obstacle.add(Obstacle(choice(['fly','snail','snail','snail'])))
+                obstacle.add(Obstacle(choice(['fly','snail', 'snail'])))
 
     if game_active:
         screen.blit(sky_surf, (0,0))
